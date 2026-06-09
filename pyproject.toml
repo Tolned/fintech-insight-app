@@ -1,0 +1,31 @@
+[project]
+name = "project-2"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ges_1",email = "lond@nolano.ru"}
+]
+requires-python = "^3.14"
+dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "et (>=0.0.2,<0.0.3)",
+    "transaction (>=5.1,<6.0)",
+    "pandas (>=3.0.3,<4.0.0)",
+    "pandas-stubs (>=3.0.3,<3.1.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "patch (>=1.16,<2.0)",
+    "transactions (>=0.2.0,<0.3.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+lint = [
+    "flake8 (>=7.3.0,<8.0.0)",
+    "mypy (>=2.1.0,<3.0.0)",
+    "black (>=26.5.1,<27.0.0)",
+    "isort (>=8.0.1,<9.0.0)"
+]
