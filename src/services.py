@@ -16,6 +16,82 @@ if not logger.handlers:
     logger.addHandler(handler)
 
 
+def sort_by_date(transactions: list) -> list:
+    """Сортирует транзакции по дате от самых свежих к самым старым.
+
+    Args:
+        transactions (list): Список транзакций (словарей).
+
+    Returns:
+        list: Отсортированный список транзакций по убыванию даты.
+    """
+    return sorted(
+        transactions,
+        key=lambda x: x.get("date", ""),
+        reverse=True
+    )
+
+
+def sort_by_cashback(transactions: list) -> list:
+    """Сортирует транзакции по величине начисленного кешбэка.
+
+    Выстраивает список транзакций по убыванию значения в поле 'cashback'.
+
+    Args:
+        transactions (list): Список транзакций (словарей).
+
+    Returns:
+        list: Отсортированный список транзакций от большего кешбэка к меньшему.
+    """
+    return sorted(
+        transactions,
+        key=lambda x: x.get("cashback", 0),
+        reverse=True
+    )
+
+
+def filter_by_currency(transactions: list, currency: str) -> list:
+    """Фильтрует транзакции по указанному коду валюты.
+
+    Args:
+        :param transactions: Список транзакций (словарей).
+        :param currency: Требуемый код валюты (например, 'RUB', 'USD').
+
+    Returns:
+        list: Список транзакций, у которых валюта совпадает с заданной.
+    """
+    return [
+        t for t in transactions
+        if t.get("currency") == currency
+    ]
+
+
+def filter_by_amount(transactions: list) -> list:
+    """Фильтрует транзакции, оставляя только операции с положительной суммой.
+
+    Используется для выделения приходных операций (поступлений).
+
+    Args:
+        transactions (list): Список транзакций (словарей).
+
+    Returns:
+        list: Список транзакций с суммой больше нуля.
+    """
+    return [t for t in transactions if t.get("amount", 0) > 0]
+
+
+def print_transactions(transactions: list) -> None:
+    """Выводит каждую транзакцию из списка на экран в сыром виде.
+
+    Предназначена для быстрой отладки данных в консоли.
+
+    Args:
+        transactions (list): Список транзакций для отображения.
+    """
+    for t in transactions:
+        print(t)
+
+
 # ==========================================
 # 1. Сервис: Выгодные категории кешбэка
 # ==========================================
@@ -26,6 +102,17 @@ def analyze_cashback_categories(
 
     Использует функциональную фильтрацию транзакций по заданному периоду.
     Округляет накопленный кешбэк по каждой категории до целых чисел.
+
+    Args:
+        data (List[Dict[str, Any]]): Список транзакций (словарей). Поддерживает
+            как стандартные ключи, так и русскоязычные наименования полей.
+        :param data:
+        :param year: Год для фильтрации данных.
+        :param month: Месяц для фильтрации данных (от 1 до 12).
+
+    Returns:
+        str: JSON-строка, содержащая категории расходов в качестве ключей
+             и округленный до целых чисел суммарный кешбэк в качестве значений.
     """
     logger.info(
         f"Старт анализа выгодности кешбэка за период {year}-{month:02d}"
@@ -35,8 +122,7 @@ def analyze_cashback_categories(
         logger.warning("На вход подан некорректный тип данных (ожидался list)")
         return json.dumps({}, ensure_ascii=False)
 
-        # Функциональная фильтрация транзакций по году, месяцу и наличию расходов
-
+    # Функциональная фильтрация транзакций по году, месяцу и наличию расходов
     def is_target_period(transaction_item: Dict[str, Any]) -> bool:
         try:
             date_str = transaction_item.get("date") or transaction_item.get("Дата операции")
@@ -74,11 +160,11 @@ def analyze_cashback_categories(
         except (ValueError, TypeError):
             continue
 
-    # Округляем итоговые суммы до целых чисел
-    result = {k: round(v) for k, v in cashback_analysis.items()}
+    # Округляем накопленный кешбэк по каждой категории до целых чисел (согласно ТЗ)
+    rounded_analysis = {cat: round(val) for cat, val in cashback_analysis.items()}
 
-    logger.info("Анализ кешбэка успешно завершен")
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    logger.info(f"Анализ завершен. Сгруппировано категорий: {len(rounded_analysis)}")
+    return json.dumps(rounded_analysis, ensure_ascii=False, indent=2)
 
 
 # ==========================================
