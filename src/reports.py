@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import pandas as pd
 
@@ -214,6 +214,50 @@ def spending_by_weekday(
     return result
 
 
+def analyze_cashback_categories(
+    data: List[Dict[str, Any]], year: int, month: int
+) -> str:
+    """Анализирует потенциальный заработок кешбэка по категориям за указанный месяц."""
+    logger.info(f"Старт анализа выгодности кешбэка за период {year}-{month:02d}")
+
+    if not isinstance(data, list):
+        logger.warning("На вход подан некорректный тип данных (ожидался list)")
+        return json.dumps({}, ensure_ascii=False)
+
+    def is_target_period(transaction_item: Dict[str, Any]) -> bool:
+        try:
+            date_str = transaction_item.get("date") or transaction_item.get("Дата операции")
+            if not date_str:
+                return False
+            dt = datetime.fromisoformat(str(date_str).replace("Z", ""))
+            tx_amount = float(transaction_item.get("amount") or transaction_item.get("Сумма операции") or 0)
+            return dt.year == year and dt.month == month and tx_amount < 0
+        except (ValueError, TypeError):
+            return False
+
+    target_transactions = list(filter(is_target_period, data))
+    cashback_analysis: Dict[str, float] = {}
+
+    for tx in target_transactions:
+        category = tx.get("category") or tx.get("Категория") or "Остальное"
+        cashback_val = tx.get("cashback") or tx.get("Кэшбэк") or 0.0
+
+        try:
+            if not cashback_val:
+                amount = float(tx.get("amount") or tx.get("Сумма операции") or 0)
+                cashback_val = abs(amount) * 0.01
+            else:
+                cashback_val = float(cashback_val)
+
+            cashback_analysis[category] = cashback_analysis.get(category, 0.0) + cashback_val
+        except (ValueError, TypeError):
+            continue
+
+    rounded_analysis = {cat: round(val) for cat, val in cashback_analysis.items()}
+    logger.info(f"Анализ завершен. Сгруппировано категорий: {len(rounded_analysis)}")
+    return json.dumps(rounded_analysis, ensure_ascii=False, indent=2)
+
+
 # ---------------------- 3. РАБОЧИЙ / ВЫХОДНОЙ ----------------------
 @report_to_file()
 def spending_by_workday(
@@ -280,7 +324,7 @@ if __name__ == "__main__":  # pragma: no cover
     """
 
     df = pd.read_excel(
-        r"A:\Project_2\data\operations.xlsx",
+        r"A:\Project\fintech-insight-app\data\operations.xlsx",
         engine="openpyxl"
     )
 
