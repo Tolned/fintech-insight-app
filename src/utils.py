@@ -60,12 +60,21 @@ def load_json(file_path: str) -> Any:
         return []
 
 
-def print_transactions(transactions):
-    """Красивый вывод транзакций"""
+def print_transactions(transactions: list[dict[str, Any]]) -> None:
+    """Выводит список транзакций в консоль в читаемом формате.
+
+    Извлекает дату (первые 10 символов), описание и сумму для каждой
+    транзакции. Если данные отсутствуют, подставляет значения по умолчанию.
+
+    Args:
+        transactions (list[dict[str, Any]]): Список словарей, где каждый словарь
+            представляет отдельную транзакцию и содержит ключи
+            'date', 'description' и 'amount'.
+    """
     for t in transactions:
-        date = t.get("date", "Нет даты")[:10]
-        description = t.get("description", "Без описания")
-        amount = t.get("amount", 0)
+        date: str = t.get("date", "Нет даты")[:10]
+        description: str = t.get("description", "Без описания")
+        amount: float | int = t.get("amount", 0)
 
         print(f"{date} {description}")
         print(f"Сумма: {amount}\n")
@@ -183,20 +192,28 @@ def filter_transactions_by_card(transactions: list, digits: str) -> list:
     return filtered
 
 
-def load_transactions(file_path: str):
+def load_transactions(file_path: str) -> list[dict[str, Any]]:
+    """Загружает данные о транзакциях из JSON-файла.
+
+    Args:
+        file_path (str): Путь к файлу в формате JSON.
+
+    Returns:
+        list: Список словарей с данными транзакций.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def calculate_balance(transactions):
+def calculate_balance(transactions: list[dict]) -> None:
     """Подсчёт баланса"""
     if not transactions:
         print("\nНет данных.")
         return
 
-    total = 0
+    total: float = 0.0
     for tx in transactions:
-        amount = tx.get("amount", 0)
+        amount: float = tx.get("amount", 0.0)
         total += amount
 
     print(f"\nТекущий баланс: {round(total, 2)}")
