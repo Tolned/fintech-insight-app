@@ -70,7 +70,7 @@
 
 <h3>1. Клонирование репозитория и установка зависимостей</h3>
 <pre><code>git clone https://github.com
-cd coursework_one
+cd fintech-insight-app
 poetry install</code></pre>
 
 <h3>2. Подготовка файлов данных</h3>
