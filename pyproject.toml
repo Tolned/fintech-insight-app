@@ -1,0 +1,25 @@
+[project]
+name = "fintech-insight-app"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ges_1",email = "lond@nolano.ru"}
+]
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "pandas (>=3.0.3,<4.0.0)",
+    "urllib3 (>=2.7.0,<3.0.0)",
+    "pandas-stubs (>=3.0.3,<3.1.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)"
+]
