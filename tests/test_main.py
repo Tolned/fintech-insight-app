@@ -1,17 +1,14 @@
+import subprocess
 import sys
 from pathlib import Path
+from unittest.mock import patch
+
+from src.main import main
 
 # 1. Принудительно прописываем корень проекта в память Python ПЕРЕД импортами
 PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
-
-
-import subprocess
-import sys
-from pathlib import Path
-from unittest.mock import patch
-from src.main import main
 
 
 def test_main_function_calls_run_app():

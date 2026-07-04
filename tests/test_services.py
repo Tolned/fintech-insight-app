@@ -11,6 +11,7 @@ from src.processing import (filter_and_sort_transactions, format_phone_number,
 # 1. ТЕСТЫ ПРИВЕТСТВИЯ ПО ВРЕМЕНИ (ТЗ №1)
 # =====================================================================
 
+
 @pytest.mark.parametrize(
     "hour, expected_welcome",
     [

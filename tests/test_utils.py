@@ -9,6 +9,7 @@ from src.utils import get_cbr_currency_rates, read_transactions_json
 # ТЕСТЫ ДЛЯ ФУНКЦИИ ЧТЕНИЯ JSON (read_transactions_json)
 # =====================================================================
 
+
 def test_read_transactions_json_success(tmp_path):
     """Тест успешного чтения корректного JSON-файла (списка словарей)."""
     # Создаем временный тестовый файл на диске
